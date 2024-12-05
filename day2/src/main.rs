@@ -5,7 +5,7 @@ use std::io::BufRead;
 use std::path::Path;
 
 fn main() {
-    let input_path = Path::new("example.txt");
+    let input_path = Path::new("input.txt");
 
     match part_one(input_path) {
         Ok(v) => println!("Part 1: {}", v),
@@ -23,42 +23,39 @@ fn part_one(input_path: &Path) -> Result<i32, Box<dyn Error>> {
             .split_whitespace()
             .map(|s| s.parse::<i32>())
             .collect::<Result<Vec<i32>, _>>()?;
-        
+
         let mut safe = true;
-        let mut increasing: Option<bool> = None;
-        
-        for i in 0..curr.len() {
-            if i == 0 {continue}
+        let mut increasing = false;
+        let mut decreasing = false;
+
+        for i in 1..curr.len() {
             let diff = curr[i] - curr[i - 1];
-            
+
             if diff == 0 {
                 safe = false;
                 break;
             }
+            
+            if diff > 0 {
+                increasing = true;
+            } else {
+                decreasing = true;
+            }
 
-            if i == 1 {
-                if diff > 0 {
-                    increasing = Some(true);
-                } else {
-                    increasing = Some(false);
-                }
-            }
-            
-            if increasing.unwrap() && diff < 0 {
-                safe = false; 
-                break;
-            }
-            
             if !(1..=3).contains(&diff.abs()) {
                 safe = false;
                 break;
             }
         }
         
+        if decreasing == increasing {
+            safe = false;
+        }
+
         if safe {
             println!("{} Safe", line);
             safe_reports += 1;
-        } else { 
+        } else {
             println!("{} Unsafe", line);
         }
     }
