@@ -4,35 +4,35 @@ use std::io;
 use std::io::BufRead;
 use std::path::Path;
 
-fn main() -> io::Result<()> {
-    let input_path = Path::new("input.txt");
+fn main() {
+    let input_path = Path::new("day2/input.txt");
 
+    match part_one(input_path) {
+        Ok(v) => println!("Part 1: {}", v),
+        Err(e) => println!("{}", e),
+    }
+
+    match part_two(input_path) {
+        Ok(v) => println!("Part 2: {}", v),
+        Err(e) => println!("{}", e),
+    }
+}
+
+fn part_one(input_path: &Path) -> Result<i32, Box<dyn Error>> {
     let lines: Vec<String> = io::BufReader::new(File::open(input_path)?)
         .lines()
         .map(|l| l.unwrap())
         .collect();
 
-    match part_one(&lines) {
-        Ok(v) => println!("Part 1: {}", v),
-        Err(e) => println!("{}", e),
-    }
-
-    match part_two(&lines) {
-        Ok(v) => println!("Part 2: {}", v),
-        Err(e) => println!("{}", e),
-    }
-    Ok(())
-}
-fn part_one(input: &[String]) -> Result<i32, Box<dyn Error>> {
     let mut safe_reports = 0;
 
-    for line in input {
+    for line in lines {
         let curr: Vec<i32> = line
             .split_whitespace()
             .map(|s| s.parse().expect("Not a number"))
             .collect();
 
-        if test_line(&curr) {
+        if check_line(&curr) {
             safe_reports += 1;
         }
     }
@@ -40,28 +40,33 @@ fn part_one(input: &[String]) -> Result<i32, Box<dyn Error>> {
     Ok(safe_reports)
 }
 
-fn part_two(input: &[String]) -> Result<i32, Box<dyn Error>> {
+fn part_two(input_path: &Path) -> Result<i32, Box<dyn Error>> {
+    let lines: Vec<String> = io::BufReader::new(File::open(input_path)?)
+        .lines()
+        .map(|l| l.unwrap())
+        .collect();
+
     let mut safe_reports = 0;
 
-    for line in input {
+    for line in lines {
         let curr: Vec<i32> = line
             .split_whitespace()
             .map(|s| s.parse().expect("Not a number"))
             .collect();
 
-        if test_line(&curr) {
+        if check_line(&curr) {
             safe_reports += 1;
         } else {
             let mut test_vecs: Vec<Vec<i32>> = vec![];
-            
+
             for i in 0..curr.len() {
                 let mut test_vec: Vec<i32> = curr.clone();
                 test_vec.remove(i);
                 test_vecs.push(test_vec);
             }
-            
+
             for vec in &test_vecs {
-                if test_line(vec) {
+                if check_line(vec) {
                     safe_reports += 1;
                     break;
                 }
@@ -72,7 +77,7 @@ fn part_two(input: &[String]) -> Result<i32, Box<dyn Error>> {
     Ok(safe_reports)
 }
 
-fn test_line(curr: &[i32]) -> bool {
+fn check_line(curr: &Vec<i32>) -> bool {
     let mut increasing = false;
     let mut decreasing = false;
 
@@ -98,4 +103,25 @@ fn test_line(curr: &[i32]) -> bool {
         return false;
     }
     true
+}
+
+#[cfg(test)]
+mod day2_tests {
+    use super::*;
+
+    #[test]
+    fn ex_part_1() {
+        let input_path = Path::new("example.txt");
+        let result = part_one(input_path);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), 2)
+    }
+
+    #[test]
+    fn ex_part_2() {
+        let input_path = Path::new("example.txt");
+        let result = part_two(input_path);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), 4)
+    }
 }
