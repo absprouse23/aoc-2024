@@ -101,23 +101,39 @@ fn part_two(input_path: &Path) -> Result<usize, Box<dyn Error>> {
 
     for row in 1..grid.len() - 1 {
         for col in 1..grid[row].len() - 1 {
+            if grid[row][col] != 'A' {
+                continue;
+            }
 
-            if grid[row][col] != 'A' {continue;}
-            
             // Up - Left
             match grid[row - 1][col - 1] {
                 'A' | 'X' => continue,
-                'S' => {if grid[row + 1][col + 1] != 'M' {continue}},
-                'M' => {if grid[row + 1][col + 1] != 'S' {continue}},
+                'S' => {
+                    if grid[row + 1][col + 1] != 'M' {
+                        continue;
+                    }
+                }
+                'M' => {
+                    if grid[row + 1][col + 1] != 'S' {
+                        continue;
+                    }
+                }
                 char => return Err(Box::<dyn Error>::from(format!("Bad data {char}"))),
             }
-
 
             // Up - Right
             match grid[row - 1][col + 1] {
                 'A' | 'X' => continue,
-                'S' => {if grid[row + 1][col - 1] != 'M' {continue}},
-                'M' => {if grid[row + 1][col - 1] != 'S' {continue}},
+                'S' => {
+                    if grid[row + 1][col - 1] != 'M' {
+                        continue;
+                    }
+                }
+                'M' => {
+                    if grid[row + 1][col - 1] != 'S' {
+                        continue;
+                    }
+                }
                 char => return Err(Box::<dyn Error>::from(format!("Bad data {char}"))),
             }
 
@@ -131,7 +147,6 @@ fn part_two(input_path: &Path) -> Result<usize, Box<dyn Error>> {
 fn new_grid(input_path: &Path) -> Result<Vec<Vec<char>>, Box<dyn Error>> {
     let grid = io::BufReader::new(File::open(input_path)?)
         .lines()
-        .into_iter()
         .map(|line| line.unwrap().chars().collect())
         .collect();
 
